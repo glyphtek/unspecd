@@ -1,0 +1,124 @@
+{
+  "name": "@glyphtek/unspecd",
+  "version": "1.0.0",
+  "description": "A declarative UI framework for building internal tools and dashboards with TypeScript. Create interactive tables, forms, and dashboards using simple specifications.",
+  "author": "Sergio Romano <sergio.h.romano@gmail.com>",
+  "license": "MIT",
+  "type": "module",
+  "keywords": [
+    "ui-framework",
+    "declarative-ui",
+    "internal-tools",
+    "dashboard",
+    "typescript",
+    "tables",
+    "forms",
+    "admin-panel",
+    "developer-tools",
+    "bun",
+    "node",
+    "cli",
+    "devex",
+    "hono",
+    "reactive",
+    "data-tables"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/glyphtek/unspecd.git"
+  },
+  "bugs": {
+    "url": "https://github.com/glyphtek/unspecd/issues"
+  },
+  "homepage": "https://glyphtek.github.io/unspecd/",
+  "funding": {
+    "type": "github",
+    "url": "https://github.com/sponsors/sergiohromano"
+  },
+  "main": "./dist/lib/index.js",
+  "module": "./dist/lib/index.js",
+  "types": "./dist/lib/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/lib/index.js",
+      "types": "./dist/lib/index.d.ts"
+    },
+    "./server": {
+      "import": "./dist/lib/server.js",
+      "types": "./dist/lib/server.d.ts"
+    },
+    "./cli": {
+      "import": "./dist/cli/index.js",
+      "types": "./dist/cli/index.d.ts"
+    }
+  },
+  "bin": {
+    "unspecd": "./dist/cli/index.js"
+  },
+  "files": [
+    "dist",
+    "examples",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md"
+  ],
+  "scripts": {
+    "build": "bun clean && bun run build:lib && bun run build:cli && bun run build:types",
+    "build:lib": "bun build ./src/lib/index.ts ./src/lib/server.ts --outdir ./dist/lib --target bun --external vite",
+    "build:cli": "bun build ./src/cli/index.ts --outdir ./dist/cli --target bun --external vite",
+    "build:types": "tsc --declaration --emitDeclarationOnly --outDir ./dist",
+    "build:node": "npm run clean && npm run build:lib:node && npm run build:cli:node && npm run build:types",
+    "build:lib:node": "bun build ./src/lib/index.ts ./src/lib/server.ts --outdir ./dist/lib --target node --external vite",
+    "build:cli:node": "bun build ./src/cli/index.ts --outdir ./dist/cli --target node --external vite",
+    "docs:dev": "vitepress dev docs",
+    "docs:build": "vitepress build docs",
+    "docs:preview": "vitepress preview docs",
+    "dev": "bun run ./examples/lib/index.ts",
+    "dev:lib": "bun run ./examples/lib/index.ts",
+    "dev:cli": "bun run dist/cli/index.js dev --cwd examples/cli",
+    "dev:watch": "bun --watch ./examples/lib/index.ts",
+    "start": "bun run dev",
+    "lint": "bunx @biomejs/biome lint ./src",
+    "format": "bunx @biomejs/biome format --write ./src",
+    "check": "bunx @biomejs/biome check --apply ./src",
+    "clean": "rm -rf dist",
+    "prepublishOnly": "bun run build && bun run test",
+    "test": "bun test",
+    "test:lib": "bun run ./examples/lib/index.ts & sleep 3 && curl -f http://localhost:3000 && pkill -f 'examples/lib/index.ts'",
+    "test:cli": "bun run dist/cli/index.js dev --cwd examples/cli & sleep 3 && curl -f http://localhost:3000 && pkill -f 'dist/cli/index.js'",
+    "test:examples": "bun run test:lib && bun run test:cli",
+    "example:lib": "bun run ./examples/lib/index.ts",
+    "example:cli": "bun run dist/cli/index.js dev --cwd examples/cli"
+  },
+  "dependencies": {
+    "@types/eventsource": "^3.0.0",
+    "@types/ws": "^8.18.1",
+    "commander": "^12.0.0",
+    "eventsource": "^4.0.0",
+    "glob": "^10.3.10",
+    "hono": "^4.0.0",
+    "ws": "^8.18.2"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^1.6.0",
+    "@types/node": "^20.11.20",
+    "bun-types": "latest",
+    "typescript": "^5.3.3",
+    "vite": "^5.0.0",
+    "vitepress": "^1.0.0",
+    "vue": "^3.4.0"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "engines": {
+    "bun": ">=1.0.0",
+    "node": ">=18.0.0"
+  },
+  "trustedDependencies": [
+    "@biomejs/biome"
+  ],
+  "publishConfig": {
+    "access": "public"
+  }
+}
