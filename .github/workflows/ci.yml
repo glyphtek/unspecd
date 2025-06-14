@@ -56,6 +56,8 @@ jobs:
           echo "Node.js CLI compatibility verification..."
           node dist/cli/index.js --version
           node dist/cli/index.js --help
+          node dist/cli/index.js dev --help
+          node dist/cli/index.js exec --help
           echo "✅ Node.js CLI compatibility verified"
   lint:
     name: Lint and Format Check
