@@ -1,0 +1,17 @@
+# Global code owners
+* @glyphtek
+
+# Core library code
+/src/lib/ @glyphtek
+
+# CLI code
+/src/cli/ @glyphtek
+
+# Documentation
+/docs/ @glyphtek
+*.md @glyphtek
+
+# Configuration files
+package.json @glyphtek
+tsconfig.json @glyphtek
+.github/ @glyphtek 
