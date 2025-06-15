@@ -5,7 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.0.0] - 2025-06-13
+## [1.0.1] - 2025-01-03
+
+### Fixed
+- Move `vite` from devDependencies to dependencies to fix CLI installation issues
+- Resolve "Cannot find package 'vite'" error when using `bunx unspecd` or `npx unspecd`
+
+## [1.0.0] - 2025-01-03
 
 ### Added
 - Initial release of Unspec'd framework
@@ -43,52 +49,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Comprehensive error handling
 - Development tools integration
 
-## [0.9.0] - 2025-06-12
-
-### Added
-- Beta release with core functionality
-- Initial CLI implementation
-- Basic component system
-- Development server
-- TypeScript definitions
-
-### Changed
-- Improved error handling
-- Enhanced documentation
-- Better type safety
-
-## [0.8.0] - 2025-06-11
-
-### Added
-- Alpha release
-- Basic framework structure
-- Initial component prototypes
-- Development environment setup
-
-### Changed
-- Early API refinements
-- Documentation improvements
-
-## [0.7.0] - 2025-06-11
-
-### Added
-- Initial prototype
-- Core architecture design
-- Basic component implementation
-- Development tooling setup
-
-### Changed
-- API design iterations
-- Documentation structure
-
 ---
 
 ## Version History
 
-- 1.0.0: First stable release (June 13, 2025)
-- 0.9.0: Beta release (June 12, 2025)
-- 0.8.0: Alpha release (June 11, 2025)
-- 0.7.0: Initial prototype (June 11, 2025)
+- 1.0.1: Critical bug fix (January 3, 2025)
+- 1.0.0: First stable release (January 3, 2025)
 
 ## Upcoming Features
 
@@ -96,12 +62,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Advanced table features (filtering, row selection, bulk actions)
 - Accessibility compliance improvements
 - Performance optimizations
-- Security features
 - Advanced deployment options
 
 ### Planned for 1.2.0
 - Multi-step form support
-- Custom CSS classes
-- Caching mechanisms
+- Custom CSS classes and theming
 - Dark/light mode support
-- Advanced theming customization 
+- Plugin system for extensibility 
