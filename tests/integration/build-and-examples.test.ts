@@ -42,7 +42,7 @@ describe('Build System Integration', () => {
     
     // Check essential package.json fields
     expect(packageJson.name).toBe('@glyphtek/unspecd');
-    expect(packageJson.version).toBe('1.0.0');
+    expect(packageJson.version).toBe('1.0.1');
     expect(packageJson.main).toBe('./dist/lib/index.js');
     expect(packageJson.module).toBe('./dist/lib/index.js');
     expect(packageJson.types).toBe('./dist/lib/index.d.ts');
