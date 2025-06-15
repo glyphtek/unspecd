@@ -1,133 +1,193 @@
 # Contributing to Unspec'd
 
-Thank you for your interest in contributing to Unspec'd! This document provides guidelines and instructions for contributing to the project.
+Thank you for your interest in contributing to Unspec'd! This document provides guidelines and information for contributors.
 
 ## Code of Conduct
 
-By participating in this project, you agree to maintain a respectful and inclusive environment for everyone.
+By participating in this project, you agree to abide by our Code of Conduct. Please be respectful and constructive in all interactions.
 
-## Development Setup
+## Getting Started
 
 ### Prerequisites
 
-- [Bun](https://bun.sh/) >= 1.0.0
-- [Node.js](https://nodejs.org/) >= 18.0.0
-- [TypeScript](https://www.typescriptlang.org/) >= 5.0.0
+- **Bun** (recommended) or **Node.js 18+**
+- **Git**
 
-### Installation
+### Development Setup
 
-1. Fork the repository
-2. Clone your fork:
+1. Fork the repository on GitHub
+2. Clone your fork locally:
    ```bash
-   git clone https://github.com/your-username/unspecd.git
+   git clone https://github.com/YOUR_USERNAME/unspecd.git
    cd unspecd
    ```
+
 3. Install dependencies:
    ```bash
    bun install
+   # or
+   npm install
    ```
 
-### Development Workflow
-
-1. Create a new branch for your feature/fix:
-   ```bash
-   git checkout -b feature/your-feature-name
-   ```
-
-2. Make your changes following our coding standards:
-   - Use TypeScript for all new code
-   - Follow the existing code style
-   - Write tests for new functionality
-   - Update documentation as needed
-
-3. Run tests:
+4. Run tests to ensure everything works:
    ```bash
    bun test
+   # or
+   npm test
    ```
 
-4. Build the project:
+5. Start development:
    ```bash
-   bun run build
+   bun run dev
+   # or
+   npm run dev
    ```
 
-5. Submit a pull request
+## Development Workflow
 
-## Project Structure
+### Building the Project
 
+The project supports both Bun and Node.js runtimes:
+
+```bash
+# Build for Bun (recommended for development)
+bun run build
+
+# Build for Node.js
+npm run build:node
+
+# Build both
+bun run build && npm run build:node
 ```
-unspecd/
-├── src/
-│   ├── lib/        # Core library code
-│   ├── cli/        # CLI implementation
-│   └── types/      # TypeScript definitions
-├── examples/       # Example implementations
-├── tests/          # Test files
-└── docs/           # Documentation
-```
 
-## Testing
-
-We use Bun's built-in test runner. Write tests for new features and ensure all tests pass before submitting a PR.
+### Running Tests
 
 ```bash
 # Run all tests
 bun test
 
 # Run specific test file
-bun test path/to/test.ts
+bun test tests/core/discovery.test.ts
+
+# Run tests with coverage
+bun test --coverage
 ```
 
-## Documentation
+### CLI Testing
 
-- Update relevant documentation when adding new features
-- Follow the existing documentation style
-- Include code examples where appropriate
-- Update the CHANGELOG.md for significant changes
+Test CLI commands during development:
 
-## Pull Request Process
+```bash
+# Test dev command
+bun run dist/cli/index.js dev --port 8080 --title "Test App"
 
-1. Update the README.md with details of changes if needed
-2. Update the CHANGELOG.md with your changes
-3. Ensure all tests pass
-4. Ensure the build succeeds
-5. Submit your PR with a clear description of changes
+# Test exec command
+bun run dist/cli/index.js exec examples/simple.ts --port 3001
+```
 
-## Version Management
+## Contributing Guidelines
 
-We follow [Semantic Versioning](https://semver.org/):
+### Reporting Issues
 
-- MAJOR version for incompatible API changes
-- MINOR version for backwards-compatible functionality
-- PATCH version for backwards-compatible bug fixes
+- Use the issue templates provided
+- Include clear reproduction steps
+- Specify your environment (OS, runtime version, etc.)
+- Add relevant labels
 
-## Feature Development Guidelines
+### Submitting Pull Requests
 
-### New Components
-- Follow the existing component patterns
-- Include TypeScript definitions
-- Add comprehensive tests
-- Document the component API
-- Include example usage
+1. Create a feature branch from `main`:
+   ```bash
+   git checkout -b feature/your-feature-name
+   ```
 
-### CLI Commands
-- Follow the existing command structure
-- Include help text and documentation
-- Add appropriate error handling
-- Include tests for the command
+2. Make your changes following our coding standards
+3. Add tests for new functionality
+4. Ensure all tests pass:
+   ```bash
+   bun test
+   npm run build:node  # Test Node.js compatibility
+   ```
 
-### Bug Fixes
-- Include a test that reproduces the bug
-- Document the fix in the PR description
-- Update the CHANGELOG.md
+5. Update documentation if needed
+6. Commit with clear, descriptive messages
+7. Push to your fork and create a pull request
 
-## Code Style
+### Coding Standards
 
-- Use TypeScript for all new code
-- Follow the existing code formatting
-- Use meaningful variable and function names
-- Add comments for complex logic
-- Keep functions small and focused
+- **TypeScript**: Use strict mode, proper typing
+- **Formatting**: We use Prettier (run `bun run format`)
+- **Linting**: Follow ESLint rules (run `bun run lint`)
+- **Testing**: Write tests for new features and bug fixes
+- **Documentation**: Update docs for API changes
 
-## Questions?
+### Commit Messages
 
-Feel free to open an issue for any questions about contributing to Unspec'd. 
+Use clear, descriptive commit messages:
+
+```
+feat: add support for custom themes in UI components
+fix: resolve CLI port parsing issue
+docs: update API documentation for ToolSpec
+test: add integration tests for discovery system
+```
+
+## Project Structure
+
+```
+src/
+├── lib/           # Core library code
+├── cli/           # CLI implementation
+└── types/         # TypeScript type definitions
+
+tests/
+├── core/          # Core functionality tests
+├── cli/           # CLI tests
+├── lib/           # Library tests
+└── integration/   # Integration tests
+
+docs/              # Documentation
+examples/          # Example projects
+```
+
+## Areas for Contribution
+
+We welcome contributions in these areas:
+
+### High Priority
+- **UI Components**: New component types, themes, styling
+- **CLI Features**: Additional commands, configuration options
+- **Documentation**: Tutorials, examples, API docs
+- **Testing**: More test coverage, integration tests
+
+### Medium Priority
+- **Performance**: Optimization, caching, bundling
+- **Developer Experience**: Better error messages, debugging tools
+- **Integrations**: Database connectors, external APIs
+
+### Ideas Welcome
+- **Plugins**: Extension system for custom functionality
+- **Templates**: Project scaffolding templates
+- **Deployment**: Hosting and deployment guides
+
+## Getting Help
+
+- **Documentation**: Check the [docs](./docs/) directory
+- **Issues**: Search existing issues or create a new one
+- **Discussions**: Use GitHub Discussions for questions
+- **Examples**: Look at the [examples](./examples/) directory
+
+## Recognition
+
+Contributors will be recognized in:
+- README.md contributors section
+- Release notes for significant contributions
+- GitHub contributors page
+
+## License
+
+By contributing to Unspec'd, you agree that your contributions will be licensed under the MIT License.
+
+---
+
+Thank you for contributing to Unspec'd! 🚀 
