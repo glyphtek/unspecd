@@ -258,12 +258,31 @@ export class UnspecdUI {
       try {
         return this.#normalizeSingleTool(tool, index);
       } catch (error) {
-        console.error(`❌ Failed to normalize tool at index ${index}:`, error);
+        // Only log errors in non-test environments to keep test output clean
+        if (!this.#isTestEnvironment()) {
+          console.error(`❌ Failed to normalize tool at index ${index}:`, error);
+        }
         throw new Error(
           `Invalid tool configuration at index ${index}: ${error instanceof Error ? error.message : 'Unknown error'}`
         );
       }
     });
+  }
+
+  /**
+   * Detects if we're running in a test environment.
+   * 
+   * @returns true if running in a test environment
+   */
+  #isTestEnvironment(): boolean {
+    return (
+      typeof process !== 'undefined' && 
+      (process.env.NODE_ENV === 'test' || 
+       process.env.VITEST === 'true' || 
+       process.env.JEST_WORKER_ID !== undefined ||
+       typeof global !== 'undefined' && 
+       (global as any).__vitest__ !== undefined)
+    );
   }
 
   /**
