@@ -92,12 +92,7 @@ function resolveToolPatterns(config: UnspecdConfig | null): string[] {
  * Validates if an object is a valid ToolSpec
  */
 function isValidToolSpec(obj: unknown): obj is ToolSpec {
-  return (
-    obj !== null &&
-    typeof obj === 'object' &&
-    'id' in obj &&
-    'title' in obj
-  );
+  return obj !== null && typeof obj === 'object' && 'id' in obj && 'title' in obj;
 }
 
 /**

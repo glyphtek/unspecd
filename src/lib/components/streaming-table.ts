@@ -9,19 +9,21 @@
 // Declare global types for tools data
 declare global {
   interface Window {
-    __UNSPECD_TOOLS_DATA__: {
-      tools: Array<{
-        id: string;
-        title: string;
-        inputs: any;
-        content: any;
-        functionNames: string[];
-        filePath?: string;
-      }>;
-      toolCount: number;
-      focusMode: boolean;
-      title?: string;
-    } | undefined;
+    __UNSPECD_TOOLS_DATA__:
+      | {
+          tools: Array<{
+            id: string;
+            title: string;
+            inputs: any;
+            content: any;
+            functionNames: string[];
+            filePath?: string;
+          }>;
+          toolCount: number;
+          focusMode: boolean;
+          title?: string;
+        }
+      | undefined;
   }
 }
 
@@ -74,8 +76,6 @@ export async function renderStreamingTableComponent(
   _specFunctions: Record<string, (params: any) => Promise<any>>,
   targetElement: HTMLElement
 ): Promise<void> {
-
-
   // Clear the target element
   targetElement.innerHTML = '';
 
@@ -369,45 +369,47 @@ export async function renderStreamingTableComponent(
     // Connect to WebSocket for streaming data
     const wsPort = window.location.port ? Number.parseInt(window.location.port) + 1 : 3001;
     const wsUrl = `ws://${window.location.hostname}:${wsPort}`;
-    
+
     console.log(`🔌 Connecting to WebSocket at ${wsUrl}`);
     const ws = new WebSocket(wsUrl);
 
     ws.onopen = () => {
       console.log('🔌 WebSocket connected');
-      
+
       // Find the tool ID from the specFunctions object
       // We need to extract the tool ID from the context
       let toolId = '';
-      
-             // Try to find the tool ID by looking for the function name in the global tools data
-       if (window.__UNSPECD_TOOLS_DATA__) {
-         const tool = window.__UNSPECD_TOOLS_DATA__.tools.find((t: any) => 
-           t.functionNames.includes(content.dataSource.functionName)
-         );
-         if (tool) {
-           toolId = tool.id;
-         }
-       }
-      
+
+      // Try to find the tool ID by looking for the function name in the global tools data
+      if (window.__UNSPECD_TOOLS_DATA__) {
+        const tool = window.__UNSPECD_TOOLS_DATA__.tools.find((t: any) =>
+          t.functionNames.includes(content.dataSource.functionName)
+        );
+        if (tool) {
+          toolId = tool.id;
+        }
+      }
+
       if (!toolId) {
         onError(new Error(`Could not find tool ID for function '${content.dataSource.functionName}'`));
         return;
       }
 
       // Start the stream
-      ws.send(JSON.stringify({
-        type: 'start-stream',
-        toolId,
-        functionName: content.dataSource.functionName,
-        params: {}
-      }));
+      ws.send(
+        JSON.stringify({
+          type: 'start-stream',
+          toolId,
+          functionName: content.dataSource.functionName,
+          params: {},
+        })
+      );
     };
 
     ws.onmessage = (event) => {
       try {
         const message = JSON.parse(event.data);
-        
+
         switch (message.type) {
           case 'data':
             onData(message.event);

@@ -42,7 +42,7 @@ async function main(): Promise<void> {
       await devCommand({
         cwd: options.cwd,
         port: Number.parseInt(options.port, 10),
-        title: options.title
+        title: options.title,
       });
     });
 
@@ -55,7 +55,7 @@ async function main(): Promise<void> {
     .action(async (file: string, options) => {
       await execCommand(file, {
         port: Number.parseInt(options.port, 10),
-        title: options.title
+        title: options.title,
       });
     });
 

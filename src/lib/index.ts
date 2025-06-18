@@ -11,6 +11,9 @@
 import type { ToolSpec } from './dsl-schema.js';
 import { renderTool } from './runtime.js';
 
+// Re-export ToolSpec for external use
+export type { ToolSpec };
+
 /**
  * Configuration object for tool registration in UnspecdUI.
  * Tools can be provided either as raw ToolSpec objects or with custom descriptions.
@@ -156,7 +159,9 @@ export class UnspecdUI {
     this.#port = config.port;
 
     const titleInfo = this.#title ? ` "${this.#title}"` : '';
-    console.log(`🔧 UnspecdUI initialized${titleInfo} with ${this.#tools.length} tools${this.#focusMode ? ' (Focus Mode)' : ''}`);
+    console.log(
+      `🔧 UnspecdUI initialized${titleInfo} with ${this.#tools.length} tools${this.#focusMode ? ' (Focus Mode)' : ''}`
+    );
 
     // Log registered tools for development visibility
     if (this.#tools.length > 0) {

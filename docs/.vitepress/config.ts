@@ -30,7 +30,7 @@ export default defineConfig({
       { text: 'API Reference', link: '/api/' },
       { text: 'Examples', link: '/examples/' },
       {
-        text: 'v1.0.0',
+        text: 'v1.1.0',
         items: [
           {
             text: 'Changelog',

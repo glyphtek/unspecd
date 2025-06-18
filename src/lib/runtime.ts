@@ -29,8 +29,6 @@ async function renderDisplayRecordComponent(
   functions: Record<string, (params: any) => Promise<any>>,
   targetElement: HTMLElement
 ): Promise<void> {
-
-
   // Create a loading indicator
   const loadingElement = document.createElement('div');
   loadingElement.className = 'flex items-center justify-center p-8';
@@ -198,12 +196,10 @@ function formatValue(value: any, formatter: string): any {
  * @param targetElement - The HTML element to render into
  */
 function renderActionButtonComponent(
-  content: ActionButtonContent,
+  _content: ActionButtonContent,
   _functions: Record<string, (params: any) => Promise<any>>,
   targetElement: HTMLElement
 ): void {
-
-
   const placeholder = document.createElement('p');
   placeholder.textContent = 'Action Button Component Placeholder';
   placeholder.className = 'text-gray-600 italic p-4 border border-dashed border-gray-300 rounded';
@@ -231,7 +227,7 @@ function createInputLabel(fieldName: string, inputDef: any): HTMLLabelElement {
  * @param inputDef - The input definition
  * @returns Object with the select element and its initial value
  */
-function createSelectElement(fieldName: string, inputDef: any): { element: HTMLSelectElement, initialValue: any } {
+function createSelectElement(fieldName: string, inputDef: any): { element: HTMLSelectElement; initialValue: any } {
   const select = document.createElement('select');
   select.id = `input-${fieldName}`;
   select.className =
@@ -246,9 +242,8 @@ function createSelectElement(fieldName: string, inputDef: any): { element: HTMLS
     });
   }
 
-  const initialValue = inputDef.defaultValue !== undefined
-    ? inputDef.defaultValue
-    : (inputDef.options ? inputDef.options[0]?.value : '');
+  const initialValue =
+    inputDef.defaultValue !== undefined ? inputDef.defaultValue : inputDef.options ? inputDef.options[0]?.value : '';
 
   return { element: select, initialValue };
 }
@@ -259,7 +254,7 @@ function createSelectElement(fieldName: string, inputDef: any): { element: HTMLS
  * @param inputDef - The input definition
  * @returns Object with the input element and its initial value
  */
-function createRegularInputElement(fieldName: string, inputDef: any): { element: HTMLInputElement, initialValue: any } {
+function createRegularInputElement(fieldName: string, inputDef: any): { element: HTMLInputElement; initialValue: any } {
   const input = document.createElement('input');
   input.id = `input-${fieldName}`;
   input.type = inputDef.type === 'text' ? 'text' : inputDef.type === 'number' ? 'number' : 'text';
@@ -282,7 +277,10 @@ function createRegularInputElement(fieldName: string, inputDef: any): { element:
  * Helper to create an input field for a given field definition.
  * Returns the input element and its initial value.
  */
-function createInputField(fieldName: string, inputDef: any): { inputElement: HTMLInputElement | HTMLSelectElement, initialValue: any, fieldContainer: HTMLElement } {
+function createInputField(
+  fieldName: string,
+  inputDef: any
+): { inputElement: HTMLInputElement | HTMLSelectElement; initialValue: any; fieldContainer: HTMLElement } {
   const fieldContainer = document.createElement('div');
 
   // Create label

@@ -32,12 +32,13 @@ describe('CLI Init Command', () => {
     test('should create all required files and directories', async () => {
       await initCommand();
 
-      // Check that all files were created
+      // Check that all files were created (no .gitignore in new implementation)
       expect(existsSync('package.json')).toBe(true);
-      expect(existsSync('.gitignore')).toBe(true);
       expect(existsSync('tools')).toBe(true);
       expect(existsSync('tools/welcome.tool.ts')).toBe(true);
       expect(existsSync('unspecd.config.ts')).toBe(true);
+      // .gitignore is no longer created
+      expect(existsSync('.gitignore')).toBe(false);
     });
 
     test('should create valid package.json', async () => {
@@ -45,23 +46,16 @@ describe('CLI Init Command', () => {
 
       const packageJson = JSON.parse(readFileSync('package.json', 'utf-8'));
       
-      expect(packageJson.name).toBe('my-unspecd-project');
-      expect(packageJson.version).toBe('1.0.0');
-      expect(packageJson.scripts.dev).toBe('unspecd dev unspecd.config.ts');
-      expect(packageJson.devDependencies.unspecd).toBe('latest');
+      // New minimal package.json only has scripts
+      expect(packageJson.scripts['unspecd:init']).toBe('unspecd init');
+      expect(packageJson.scripts['unspecd:dev']).toBe('unspecd dev');
+      // Other fields are no longer included in minimal version
+      expect(packageJson.name).toBeUndefined();
+      expect(packageJson.version).toBeUndefined();
+      expect(packageJson.devDependencies).toBeUndefined();
     });
 
-    test('should create .gitignore with proper entries', async () => {
-      await initCommand();
 
-      const gitignore = readFileSync('.gitignore', 'utf-8');
-      
-      expect(gitignore).toContain('node_modules/');
-      expect(gitignore).toContain('.env*');
-      expect(gitignore).toContain('dist/');
-      expect(gitignore).toContain('.DS_Store');
-      expect(gitignore).toContain('*.log');
-    });
 
     test('should create tools directory', async () => {
       await initCommand();
@@ -78,10 +72,10 @@ describe('CLI Init Command', () => {
 
       const welcomeToolContent = readFileSync('tools/welcome.tool.ts', 'utf-8');
       
-      expect(welcomeToolContent).toContain('import { ToolSpec } from \'unspecd\'');
-      expect(welcomeToolContent).toContain('id: \'welcome\'');
-      expect(welcomeToolContent).toContain('title: \'🎉 Welcome to Unspec\'d\'');
-      expect(welcomeToolContent).toContain('type: \'displayRecord\'');
+      expect(welcomeToolContent).toContain('import { ToolSpec } from \'@glyphtek/unspecd\'');
+      expect(welcomeToolContent).toContain('id: `welcome`');
+      expect(welcomeToolContent).toContain('title: `🎉 Welcome to Unspec\'d`');
+      expect(welcomeToolContent).toContain('type: `displayRecord`');
       expect(welcomeToolContent).toContain('export default welcomeTool');
     });
 
@@ -175,15 +169,15 @@ describe('CLI Init Command', () => {
       const welcomeToolContent = readFileSync('tools/welcome.tool.ts', 'utf-8');
       
       // Should contain required ToolSpec properties
-      expect(welcomeToolContent).toContain('id: \'welcome\'');
+      expect(welcomeToolContent).toContain('id: `welcome`');
       expect(welcomeToolContent).toContain('title:');
       expect(welcomeToolContent).toContain('content: {');
       expect(welcomeToolContent).toContain('functions: {');
       
       // Should have proper displayRecord configuration
-      expect(welcomeToolContent).toContain('type: \'displayRecord\'');
+      expect(welcomeToolContent).toContain('type: `displayRecord`');
       expect(welcomeToolContent).toContain('dataLoader: {');
-      expect(welcomeToolContent).toContain('functionName: \'getWelcomeData\'');
+      expect(welcomeToolContent).toContain('functionName: `getWelcomeData`');
       expect(welcomeToolContent).toContain('displayConfig: {');
       expect(welcomeToolContent).toContain('fields: [');
     });

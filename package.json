@@ -1,6 +1,6 @@
 {
   "name": "@glyphtek/unspecd",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "A declarative UI framework for building internal tools and dashboards with TypeScript. Create interactive tables, forms, and dashboards using simple specifications.",
   "author": "Sergio Romano <sergio.h.romano@gmail.com>",
   "license": "MIT",

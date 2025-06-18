@@ -89,11 +89,9 @@ export function renderActionButtonComponent(
         // Provide immediate feedback - disable button and change text
         button.disabled = true;
         button.textContent = 'Executing...';
-
-
       },
 
-      onFulfilled: (data: any) => {
+      onFulfilled: (_data: any) => {
         // Re-enable button and restore original label
         button.disabled = false;
         button.textContent = originalLabel;
@@ -105,8 +103,6 @@ export function renderActionButtonComponent(
           // Default success message
           window.alert('Action completed successfully!');
         }
-
-
       },
 
       onRejected: (error: Error) => {

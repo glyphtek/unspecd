@@ -33,7 +33,7 @@
  */
 
 import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
-import { join, resolve, relative } from 'node:path';
+import { join, relative, resolve } from 'node:path';
 import { type DiscoveryConfig, startDevServer } from '../core/server.js';
 import { UnspecdUI } from './index.js';
 
@@ -152,7 +152,6 @@ export async function startServer(
   config?: LibraryServerConfig,
   targetFile?: string
 ): Promise<void> {
-
   // If we're in UI mode, just initialize the UI and skip server startup
   if (globalThis.__UNSPECD_UI_MODE__) {
     if (appOrConfig instanceof UnspecdUI) {
@@ -196,12 +195,12 @@ export async function startServer(
         toolCount: appOrConfig.toolCount,
         focusMode: appOrConfig.focusMode,
       };
-      
+
       // Only add title if it's defined
       if (appOrConfig.title !== undefined) {
         toolsData.title = appOrConfig.title;
       }
-      
+
       globalThis.__UNSPECD_TOOLS_DATA__ = toolsData;
 
       // Generate a simple HTML entry point that fetches tools from API
@@ -211,18 +210,18 @@ export async function startServer(
       }
 
       const entryPointPath = join(tempDir, 'app.ts');
-      
+
       // Calculate the correct relative path to src/lib/index.js from the entry point
       // Find the project root by looking for package.json
       let projectRoot = process.cwd();
       while (projectRoot !== '/' && !existsSync(join(projectRoot, 'package.json'))) {
         projectRoot = resolve(projectRoot, '..');
       }
-      
+
       const entryPointDir = join(process.cwd(), tempDir);
       const srcLibPath = join(projectRoot, 'src', 'lib', 'index.js');
       const relativePath = relative(entryPointDir, srcLibPath).replace(/\\/g, '/');
-      
+
       const entryPointContent = `// Library mode app entry point with function proxies
 import { UnspecdUI } from './${relativePath}';
 
@@ -320,13 +319,13 @@ function findScriptInProcessArgs(): string | null {
   for (let i = 1; i < process.argv.length; i++) {
     const arg = process.argv[i];
     if (!arg) continue;
-    
+
     // Look for files that end with common script extensions
     if ((arg.endsWith('.ts') || arg.endsWith('.js') || arg.endsWith('.mjs')) && existsSync(arg)) {
       console.log(`✅ Found calling script via process.argv: ${arg}`);
       return arg;
     }
-    
+
     // Try resolving it
     const resolved = resolve(arg);
     if ((resolved.endsWith('.ts') || resolved.endsWith('.js') || resolved.endsWith('.mjs')) && existsSync(resolved)) {
@@ -375,10 +374,7 @@ function findScriptInStackTrace(): string | null {
   if (!stack) return null;
 
   const lines = stack.split('\n');
-  const patterns = [
-    /at\s+.*\s+\(([^)]+)\)/,
-    /at\s+([^\s]+)/,
-  ];
+  const patterns = [/at\s+.*\s+\(([^)]+)\)/, /at\s+([^\s]+)/];
 
   for (const line of lines) {
     for (const pattern of patterns) {
@@ -417,14 +413,14 @@ function findCallingScript(targetFile?: string): string | null {
  */
 function generateEntryPointFromTools(ui: UnspecdUI): string {
   const tools = ui.tools;
-  
+
   // Calculate the correct relative path to src/lib/index.js from the entry point
   // Find the project root by looking for package.json
   let projectRoot = process.cwd();
   while (projectRoot !== '/' && !existsSync(join(projectRoot, 'package.json'))) {
     projectRoot = resolve(projectRoot, '..');
   }
-  
+
   const entryPointDir = join(process.cwd(), '.unspecd');
   const srcLibPath = join(projectRoot, 'src', 'lib', 'index.js');
   const relativePath = relative(entryPointDir, srcLibPath).replace(/\\/g, '/');

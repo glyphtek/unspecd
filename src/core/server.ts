@@ -1,8 +1,68 @@
 import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, join, relative } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { type Plugin, createServer } from 'vite';
-import { type DiscoveryConfig, discoverTools } from './discovery.js';
 import { WebSocketServer } from 'ws';
+import { type DiscoveryConfig, discoverTools } from './discovery.js';
+
+/**
+ * Detects if the CLI is running from a global installation
+ * @returns The import path to use for UnspecdUI
+ */
+function detectImportPath(): string {
+  try {
+    // Get the current module path
+    const currentModulePath = fileURLToPath(import.meta.url);
+
+    // Normalize path separators for cross-platform compatibility
+    const normalizedPath = currentModulePath.replace(/\\/g, '/');
+
+    // Common global installation paths
+    const globalPatterns = [
+      '/usr/local/lib/node_modules/',
+      '/usr/lib/node_modules/',
+      '/.npm-global/lib/node_modules/',
+      '/lib/node_modules/',
+      // Windows patterns
+      '/AppData/Roaming/npm/node_modules/',
+      '/AppData/Local/npm/node_modules/',
+    ];
+
+    // Check if we're running from a global installation
+    const isGlobal =
+      normalizedPath.includes('/node_modules/@glyphtek/unspecd/') &&
+      globalPatterns.some((pattern) => normalizedPath.includes(pattern));
+
+    if (isGlobal) {
+      console.log('🌍 Global installation detected');
+
+      // Find the global node_modules path
+      const nodeModulesIndex = normalizedPath.lastIndexOf('/node_modules/@glyphtek/unspecd/');
+      if (nodeModulesIndex !== -1) {
+        const globalBasePath = normalizedPath.substring(0, nodeModulesIndex);
+        const globalLibPath = `${globalBasePath}/node_modules/@glyphtek/unspecd/dist/lib/index.js`;
+
+        // Check if the global lib file exists
+        if (existsSync(globalLibPath.replace(/^file:\/\//, ''))) {
+          console.log(`📍 Using global path: ${globalLibPath}`);
+          return globalLibPath;
+        }
+      }
+
+      // Fallback to package name if we can't construct the path
+      console.log('📦 Could not resolve global path, falling back to package import');
+      return '@glyphtek/unspecd';
+    }
+    console.log('📦 Local installation expected');
+    return '@glyphtek/unspecd';
+  } catch (error) {
+    console.log(
+      '📦 Fallback to package import due to error:',
+      error instanceof Error ? error.message : 'Unknown error'
+    );
+    return '@glyphtek/unspecd';
+  }
+}
 
 // Extend global type for tools data API
 declare global {
@@ -408,9 +468,12 @@ function generateTempEntryPoint(discoveredTools: Array<{ spec: any; filePath: st
     })
     .join('\n');
 
+  // Detect the correct import path based on installation type
+  const importPath = detectImportPath();
+
   // Generate the complete entry point content
   const entryPointContent = `${imports}
-import { UnspecdUI } from '../src/lib/index.js';
+import { UnspecdUI } from '${importPath}';
 
 // Initialize views array
 const views: any[] = [];
@@ -448,7 +511,7 @@ function handleStreamingFunctionsRequest(res: any) {
 
     // Find all streaming functions
     const streamingFunctions: Record<string, any> = {};
-    
+
     appInstance.tools.forEach((tool: any) => {
       if (tool.spec.content?.type === 'streamingTable') {
         const functionName = tool.spec.content.dataSource?.functionName;
@@ -463,16 +526,20 @@ function handleStreamingFunctionsRequest(res: any) {
 
     res.statusCode = 200;
     res.setHeader('Content-Type', 'application/json');
-    res.end(JSON.stringify({ 
-      success: true, 
-      functionCount: Object.keys(streamingFunctions).length 
-    }));
+    res.end(
+      JSON.stringify({
+        success: true,
+        functionCount: Object.keys(streamingFunctions).length,
+      })
+    );
   } catch (error) {
     res.statusCode = 500;
     res.setHeader('Content-Type', 'application/json');
-    res.end(JSON.stringify({ 
-      error: error instanceof Error ? error.message : 'Unknown error' 
-    }));
+    res.end(
+      JSON.stringify({
+        error: error instanceof Error ? error.message : 'Unknown error',
+      })
+    );
   }
 }
 
@@ -507,13 +574,14 @@ function handleFunctionExecutionRequest(body: string, res: any) {
 
     // Check if this is a streaming function (used by streamingTable content type)
     // Streaming functions should only be called by the streaming table component, not via API
-    if (tool.spec.content?.type === 'streamingTable' && 
-        tool.spec.content?.dataSource?.functionName === functionName) {
+    if (tool.spec.content?.type === 'streamingTable' && tool.spec.content?.dataSource?.functionName === functionName) {
       res.statusCode = 400;
       res.setHeader('Content-Type', 'application/json');
-      res.end(JSON.stringify({ 
-        error: `Function '${functionName}' is a streaming function and cannot be called via API. It should only be used by the streamingTable component.` 
-      }));
+      res.end(
+        JSON.stringify({
+          error: `Function '${functionName}' is a streaming function and cannot be called via API. It should only be used by the streamingTable component.`,
+        })
+      );
       return;
     }
 
@@ -623,7 +691,7 @@ export async function startDevServer(config: ServerConfig): Promise<void> {
 
           if (type === 'start-stream') {
             console.log(`🔄 Starting stream for ${toolId}.${functionName}`);
-            
+
             const appInstance = globalThis.__UNSPECD_APP_INSTANCE__;
             if (!appInstance) {
               ws.send(JSON.stringify({ type: 'error', error: 'No app instance available' }));
@@ -658,23 +726,27 @@ export async function startDevServer(config: ServerConfig): Promise<void> {
                 onDisconnect: () => {
                   ws.send(JSON.stringify({ type: 'disconnect' }));
                 },
-                ...params
+                ...params,
               });
 
               // Store cleanup function for when connection closes
               (ws as any)._cleanup = cleanup;
             } catch (error) {
-              ws.send(JSON.stringify({ 
-                type: 'error', 
-                error: error instanceof Error ? error.message : 'Unknown error' 
-              }));
+              ws.send(
+                JSON.stringify({
+                  type: 'error',
+                  error: error instanceof Error ? error.message : 'Unknown error',
+                })
+              );
             }
           }
         } catch (error) {
-          ws.send(JSON.stringify({ 
-            type: 'error', 
-            error: error instanceof Error ? error.message : 'Invalid message format' 
-          }));
+          ws.send(
+            JSON.stringify({
+              type: 'error',
+              error: error instanceof Error ? error.message : 'Invalid message format',
+            })
+          );
         }
       });
 

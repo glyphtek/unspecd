@@ -5,6 +5,32 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0] - 2025-01-06
+
+### Added
+- Global CLI installation detection and support
+- Automatic import path resolution for global vs local installations
+- Export of `ToolSpec` type from main entry point for library mode
+- Cross-platform compatibility for Windows, macOS, and Linux global installations
+
+### Changed
+- **BREAKING**: Init command no longer creates `.gitignore` file
+- Init command now creates minimal `package.json` (scripts only) when file doesn't exist
+- Init command adds `unspecd:init` and `unspecd:dev` scripts to existing `package.json`
+- Updated welcome tool example to use `@glyphtek/unspecd` import
+- Fixed quote escaping issues in generated tool files (now uses backticks)
+
+### Fixed
+- CLI now works with global installation only (no local dependency required)
+- Resolved import path issues in generated entry files
+- Fixed template string escaping in init command generated files
+
+### Technical
+- Enhanced global installation detection with robust fallback mechanisms
+- Improved error handling and logging for installation type detection
+- Updated test suite to match new init command behavior
+- Cleaned up linting warnings and code style issues
+
 ## [1.0.1] - 2025-01-03
 
 ### Fixed
@@ -53,6 +79,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Version History
 
+- 1.1.0: Global CLI support and init improvements (January 6, 2025)
 - 1.0.1: Critical bug fix (January 3, 2025)
 - 1.0.0: First stable release (January 3, 2025)
 

@@ -354,7 +354,7 @@ export function renderSmartTableComponent(
    * Handles case where no data is available.
    */
   function renderTableBody(tbody?: HTMLTableSectionElement): void {
-    const tableBody = tbody || document.querySelector('#unspecd-table-body') as HTMLTableSectionElement;
+    const tableBody = tbody || (document.querySelector('#unspecd-table-body') as HTMLTableSectionElement);
     if (!tableBody || !currentTableData) {
       console.warn('Table body element not found or no data available');
       return;
@@ -461,7 +461,11 @@ export function renderSmartTableComponent(
    * @param data - The table data
    * @returns The table container and table elements
    */
-  function createTableStructure(data: TableData): { tableContainer: HTMLElement, table: HTMLTableElement, tbody: HTMLTableSectionElement } {
+  function createTableStructure(data: TableData): {
+    tableContainer: HTMLElement;
+    table: HTMLTableElement;
+    tbody: HTMLTableSectionElement;
+  } {
     // Create table container
     const tableContainer = document.createElement('div');
     tableContainer.className = 'overflow-x-auto bg-white border border-gray-200 rounded-lg shadow-sm';

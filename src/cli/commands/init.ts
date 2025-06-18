@@ -5,12 +5,12 @@
  * directory structure, configuration files, and example tools.
  */
 
-import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 /**
  * Handles the init command for creating a new Unspec'd project.
- * Creates package.json, .gitignore, tools directory, example tool, and unspecd.config.ts.
+ * Creates or updates package.json, tools directory, example tool, and unspecd.config.ts.
  */
 export async function initCommand(): Promise<void> {
   console.log("🚀 Initializing new Unspec'd project...");
@@ -22,74 +22,30 @@ export async function initCommand(): Promise<void> {
   }
 
   try {
-    // Create package.json
-    console.log('📦 Creating package.json...');
-    const packageJson = {
-      name: 'my-unspecd-project',
-      version: '1.0.0',
-      description: "A new Unspec'd project",
-      main: 'unspecd.config.ts',
-      scripts: {
-        dev: 'unspecd dev unspecd.config.ts',
-      },
-      devDependencies: {
-        unspecd: 'latest',
-      },
-    };
-    writeFileSync('package.json', JSON.stringify(packageJson, null, 2));
+    // Handle package.json - create minimal if doesn't exist, or add scripts to existing
+    if (existsSync('package.json')) {
+      console.log("📦 Adding Unspec'd scripts to existing package.json...");
+      const existingPackageContent = readFileSync('package.json', 'utf-8');
+      const existingPackage = JSON.parse(existingPackageContent);
 
-    // Create .gitignore
-    console.log('📝 Creating .gitignore...');
-    const gitignoreContent = `# Dependencies
-node_modules/
-.npm
-.pnpm-store/
+      // Add or update scripts
+      existingPackage.scripts = {
+        ...existingPackage.scripts,
+        'unspecd:init': 'unspecd init',
+        'unspecd:dev': 'unspecd dev',
+      };
 
-# Environment variables
-.env*
-!.env.example
-
-# Build outputs
-dist/
-build/
-.output/
-
-# OS generated files
-.DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
-Thumbs.db
-
-# IDE files
-.vscode/
-.idea/
-*.swp
-*.swo
-
-# Logs
-*.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
-# Runtime data
-pids
-*.pid
-*.seed
-*.pid.lock
-
-# Coverage directory used by tools like istanbul
-coverage/
-.nyc_output/
-
-# Temporary folders
-tmp/
-temp/
-`;
-    writeFileSync('.gitignore', gitignoreContent);
+      writeFileSync('package.json', JSON.stringify(existingPackage, null, 2));
+    } else {
+      console.log('📦 Creating minimal package.json...');
+      const packageJson = {
+        scripts: {
+          'unspecd:init': 'unspecd init',
+          'unspecd:dev': 'unspecd dev',
+        },
+      };
+      writeFileSync('package.json', JSON.stringify(packageJson, null, 2));
+    }
 
     // Create tools directory
     console.log('📁 Creating tools/ directory...');
@@ -97,7 +53,7 @@ temp/
 
     // Create example tool file
     console.log('🛠️  Creating tools/welcome.tool.ts...');
-    const welcomeToolContent = `import { ToolSpec } from 'unspecd';
+    const welcomeToolContent = `import { ToolSpec } from '@glyphtek/unspecd';
 
 /**
  * Welcome Tool - A simple example to get you started with Unspec'd
@@ -106,20 +62,20 @@ temp/
  * for showing structured information like dashboards, profiles, or summaries.
  */
 const welcomeTool: ToolSpec = {
-  id: 'welcome',
-  title: '🎉 Welcome to Unspec\'d',
+  id: \`welcome\`,
+  title: \`🎉 Welcome to Unspec'd\`,
 
   content: {
-    type: 'displayRecord',
+    type: \`displayRecord\`,
     dataLoader: {
-      functionName: 'getWelcomeData'
+      functionName: \`getWelcomeData\`
     },
     displayConfig: {
       fields: [
-        { field: 'message', label: 'Welcome Message' },
-        { field: 'description', label: 'What is Unspec\'d?' },
-        { field: 'nextSteps', label: 'Next Steps' },
-        { field: 'documentation', label: 'Learn More' }
+        { field: \`message\`, label: \`Welcome Message\` },
+        { field: \`description\`, label: \`What is Unspec'd?\` },
+        { field: \`nextSteps\`, label: \`Next Steps\` },
+        { field: \`documentation\`, label: \`Learn More\` }
       ]
     }
   },
@@ -127,10 +83,10 @@ const welcomeTool: ToolSpec = {
   functions: {
     getWelcomeData: async () => {
       return {
-        message: 'Congratulations! Your Unspec\'d project is ready.',
-        description: 'Unspec\'d is a framework for building admin tools, dashboards, and internal applications using a declarative specification approach. Define your tools with simple configuration objects, and let the framework handle the UI.',
-        nextSteps: 'Try modifying this tool or create new ones in the tools/ directory. Each tool is defined by a ToolSpec object that describes its data sources and UI configuration.',
-        documentation: 'Visit the Unspec\'d documentation to learn about different content types like editableTable, actionButton, and editForm.'
+        message: \`Congratulations! Your Unspec'd project is ready.\`,
+        description: \`Unspec'd is a framework for building admin tools, dashboards, and internal applications using a declarative specification approach. Define your tools with simple configuration objects, and let the framework handle the UI.\`,
+        nextSteps: \`Try modifying this tool or create new ones in the tools/ directory. Each tool is defined by a ToolSpec object that describes its data sources and UI configuration.\`,
+        documentation: \`Visit the Unspec'd documentation to learn about different content types like editableTable, actionButton, and editForm.\`
       };
     }
   }
@@ -168,7 +124,7 @@ export default [
     console.log('Next steps:');
     console.log('');
     console.log("1. Run 'bun install' to install dependencies.");
-    console.log("2. Run 'bunx unspecd dev' to start the dashboard with all tools.");
+    console.log("2. Run 'npm run unspecd:dev' or 'bun run unspecd:dev' to start the dashboard.");
     console.log('3. Open your browser to http://localhost:3000 to see your dashboard.');
     console.log('');
     console.log('🎯 Framework Mode Features:');

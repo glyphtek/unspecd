@@ -32,8 +32,7 @@ function isUnspecdUIInstance(obj: any): boolean {
   return (
     obj &&
     typeof obj === 'object' &&
-    (obj.constructor?.name === 'UnspecdUI' ||
-      ('tools' in obj && Array.isArray(obj.tools)))
+    (obj.constructor?.name === 'UnspecdUI' || ('tools' in obj && Array.isArray(obj.tools)))
   );
 }
 
@@ -43,7 +42,8 @@ function findToolSpecs(module: any, resolvedPath: string): any[] {
     if (
       exportValue &&
       typeof exportValue === 'object' &&
-      'id' in exportValue && 'title' in exportValue &&
+      'id' in exportValue &&
+      'title' in exportValue &&
       'content' in exportValue
     ) {
       console.log(`🔧 Detected ToolSpec in export '${exportName}', creating UnspecdUI wrapper`);
@@ -73,7 +73,7 @@ function startFallbackDevServer(resolvedPath: string, options: ExecCommandOption
  */
 export async function execCommand(toolFilePath: string, options: ExecCommandOptions): Promise<void> {
   const { port = 3000, title } = options;
-  
+
   console.log(`🎯 Starting Focus Mode for: ${toolFilePath}`);
   if (title) {
     console.log(`📝 Application title: ${title}`);
@@ -125,7 +125,7 @@ export async function execCommand(toolFilePath: string, options: ExecCommandOpti
     console.log(`📦 Creating UnspecdUI instance with ${toolSpecs.length} tool(s)`);
     // Dynamically import UnspecdUI
     const { UnspecdUI } = await import('../../lib/index.js');
-    
+
     // Create UnspecdUI config with optional title
     const uiConfig: any = {
       tools: toolSpecs,
@@ -134,7 +134,7 @@ export async function execCommand(toolFilePath: string, options: ExecCommandOpti
     if (title) {
       uiConfig.title = title;
     }
-    
+
     const ui = new UnspecdUI(uiConfig);
     await startServer(ui, { port }, resolvedPath);
     return;

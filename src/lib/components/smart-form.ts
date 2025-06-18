@@ -272,16 +272,16 @@ function gatherFieldValue(fieldConfig: FormFieldConfig): any {
   switch (fieldConfig.editorType) {
     case 'checkbox':
       return gatherCheckboxValue(fieldName);
-    
+
     case 'radio':
       return gatherRadioValue(fieldName);
-    
+
     case 'number':
       return gatherNumberValue(fieldName);
-    
+
     case 'select':
       return gatherSelectValue(fieldName);
-    
+
     default:
       return gatherTextValue(fieldName);
   }
@@ -457,11 +457,7 @@ function configureCheckboxInput(
  * @param fieldConfig - The field configuration
  * @param initialValue - The initial value to set
  */
-function configureRadioInput(
-  inputElement: HTMLElement,
-  fieldConfig: FormFieldConfig,
-  initialValue: any
-): void {
+function configureRadioInput(inputElement: HTMLElement, fieldConfig: FormFieldConfig, initialValue: any): void {
   // Set initial value
   const valueToSet = initialValue !== undefined ? initialValue : fieldConfig.defaultValue;
   if (valueToSet !== undefined) {

@@ -7,8 +7,68 @@
 
 import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, join, relative } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { discoverTools } from '../../core/discovery.js';
 import { startDevServer } from '../../core/server.js';
+
+/**
+ * Detects if the CLI is running from a global installation
+ * @returns The import path to use for UnspecdUI
+ */
+function detectImportPath(): string {
+  try {
+    // Get the current module path
+    const currentModulePath = fileURLToPath(import.meta.url);
+
+    // Normalize path separators for cross-platform compatibility
+    const normalizedPath = currentModulePath.replace(/\\/g, '/');
+
+    // Common global installation paths
+    const globalPatterns = [
+      '/usr/local/lib/node_modules/',
+      '/usr/lib/node_modules/',
+      '/.npm-global/lib/node_modules/',
+      '/lib/node_modules/',
+      // Windows patterns
+      '/AppData/Roaming/npm/node_modules/',
+      '/AppData/Local/npm/node_modules/',
+    ];
+
+    // Check if we're running from a global installation
+    const isGlobal =
+      normalizedPath.includes('/node_modules/@glyphtek/unspecd/') &&
+      globalPatterns.some((pattern) => normalizedPath.includes(pattern));
+
+    if (isGlobal) {
+      console.log('🌍 Global installation detected');
+
+      // Find the global node_modules path
+      const nodeModulesIndex = normalizedPath.lastIndexOf('/node_modules/@glyphtek/unspecd/');
+      if (nodeModulesIndex !== -1) {
+        const globalBasePath = normalizedPath.substring(0, nodeModulesIndex);
+        const globalLibPath = `${globalBasePath}/node_modules/@glyphtek/unspecd/dist/lib/index.js`;
+
+        // Check if the global lib file exists
+        if (existsSync(globalLibPath.replace(/^file:\/\//, ''))) {
+          console.log(`📍 Using global path: ${globalLibPath}`);
+          return globalLibPath;
+        }
+      }
+
+      // Fallback to package name if we can't construct the path
+      console.log('📦 Could not resolve global path, falling back to package import');
+      return '@glyphtek/unspecd';
+    }
+    console.log('📦 Local installation expected');
+    return '@glyphtek/unspecd';
+  } catch (error) {
+    console.log(
+      '📦 Fallback to package import due to error:',
+      error instanceof Error ? error.message : 'Unknown error'
+    );
+    return '@glyphtek/unspecd';
+  }
+}
 
 /**
  * Options for the dev command
@@ -27,7 +87,10 @@ interface DevCommandOptions {
  * @param options - Command options including title
  * @returns Path to the generated temporary entry point file
  */
-function generateTempEntryPoint(discoveredTools: Array<{ spec: any; filePath: string }>, options: DevCommandOptions): string {
+function generateTempEntryPoint(
+  discoveredTools: Array<{ spec: any; filePath: string }>,
+  options: DevCommandOptions
+): string {
   // Create temporary directory
   const tempDir = '.unspecd';
   if (!existsSync(tempDir)) {
@@ -77,13 +140,14 @@ function generateTempEntryPoint(discoveredTools: Array<{ spec: any; filePath: st
     .join('\n');
 
   // Generate the UnspecdUI configuration with optional title
-  const uiConfig = options.title 
-    ? `{ tools, title: '${options.title}' }`
-    : '{ tools }';
+  const uiConfig = options.title ? `{ tools, title: '${options.title}' }` : '{ tools }';
+
+  // Detect the correct import path based on installation type
+  const importPath = detectImportPath();
 
   // Generate the complete entry point content
   const entryPointContent = `${imports}
-import { UnspecdUI } from '../src/lib/index.js';
+import { UnspecdUI } from '${importPath}';
 
 // Initialize tools array
 const tools: any[] = [];
@@ -117,7 +181,7 @@ ui.init();`;
  */
 export async function devCommand(options: DevCommandOptions): Promise<void> {
   const { cwd = process.cwd(), port = 3000, title } = options;
-  
+
   console.log('🏗️  Starting Dashboard Mode - Discovering tools...');
   if (title) {
     console.log(`📝 Application title: ${title}`);
